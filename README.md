@@ -29,6 +29,8 @@ npm install
 
 ### 2. 配置 API Key
 
+**注意**: 根端点（`/`）不需要 API Key，可以直接访问获取服务信息。其他所有端点都需要提供 API Key。
+
 有三种方式提供 Gemini API Key：
 
 #### 方式 1: 环境变量（推荐用于生产环境）
@@ -93,6 +95,14 @@ Worker 将在 `http://localhost:8787` 启动。
 
 代理服务会将所有请求转发到 `https://generativelanguage.googleapis.com`。
 
+#### 示例 0: 访问根端点（无需 API Key）
+
+```bash
+curl "https://your-worker.workers.dev/"
+```
+
+返回 JSON 格式的服务使用说明和示例。
+
 #### 示例 1: 列出可用模型
 
 ```bash
@@ -122,9 +132,18 @@ curl -X POST \
   "https://your-worker.workers.dev/v1beta/models/gemini-flash-latest:generateContent"
 ```
 
-#### 示例 3: 在 JavaScript 中使用
+#### 示例 3: 访问根端点（无需 API Key）
+
+```bash
+curl "https://your-worker.workers.dev/"
+```
+
+返回 JSON 格式的使用说明。
+
+#### 示例 4: 在 JavaScript 中使用
 
 ```javascript
+// 列出模型
 const response = await fetch('https://your-worker.workers.dev/v1/models', {
   headers: {
     'X-Goog-Api-Key': 'YOUR_API_KEY'
@@ -133,18 +152,29 @@ const response = await fetch('https://your-worker.workers.dev/v1/models', {
 
 const data = await response.json();
 console.log(data);
+
+// 访问根端点（无需 API Key）
+const rootResponse = await fetch('https://your-worker.workers.dev/');
+const rootData = await rootResponse.json();
+console.log(rootData);
 ```
 
 ### 支持的 API 端点
 
 所有 Gemini API 端点都支持，包括：
 
-- `/v1/models` - 列出模型
-- `/v1/models/{model}` - 获取模型信息
-- `/v1beta/models/{model}:generateContent` - 生成内容
-- `/v1beta/models/{model}:streamGenerateContent` - 流式生成内容
-- `/v1beta/models/{model}:embedContent` - 生成嵌入
+- `/` - 根端点（信息页面，**无需 API Key**）
+- `/v1/models` - 列出模型（需要 API Key）
+- `/v1/models/{model}` - 获取模型信息（需要 API Key）
+- `/v1beta/models/{model}:generateContent` - 生成内容（需要 API Key）
+- `/v1beta/models/{model}:streamGenerateContent` - 流式生成内容（需要 API Key）
+- `/v1beta/models/{model}:embedContent` - 生成嵌入（需要 API Key）
 - 等等...
+
+**注意**：
+
+- 根端点（`/`）不需要 API Key，返回服务使用说明
+- 其他所有端点都需要提供 API Key（通过请求头、查询参数或环境变量）
 
 只需将原始 Gemini API URL 中的域名部分替换为你的 Worker URL 即可。
 
@@ -232,7 +262,54 @@ npm run type-check
 
 ### 测试
 
-项目提供了两种测试脚本：
+#### 测试生产环境
+
+部署到生产环境后，可以使用以下方法测试：
+
+**方法 1: 使用 TypeScript 测试脚本（推荐）**
+
+```bash
+# 测试生产环境（替换为你的生产 URL 和 API Key）
+PROXY_URL=https://gemini-bridge.happyluoding.workers.dev API_KEY=your_key npm run test:gemini
+```
+
+**方法 2: 使用 Shell 测试脚本**
+
+```bash
+# 测试生产环境
+PROXY_URL=https://gemini-bridge.happyluoding.workers.dev API_KEY=your_key ./scripts/test-gemini.sh
+
+# 或直接传递参数
+./scripts/test-gemini.sh https://gemini-bridge.happyluoding.workers.dev your_api_key
+```
+
+**方法 3: 快速手动测试（使用 curl）**
+
+```bash
+# 1. 列出可用模型
+curl "https://gemini-bridge.happyluoding.workers.dev/v1/models?key=YOUR_API_KEY"
+
+# 2. 使用请求头传递 API Key
+curl -H "X-Goog-Api-Key: YOUR_API_KEY" \
+  "https://gemini-bridge.happyluoding.workers.dev/v1/models"
+
+# 3. 生成内容
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "X-Goog-Api-Key: YOUR_API_KEY" \
+  -d '{"contents":[{"parts":[{"text":"Hello!"}]}]}' \
+  "https://gemini-bridge.happyluoding.workers.dev/v1beta/models/gemini-flash-latest:generateContent"
+
+# 4. 测试根端点
+curl "https://gemini-bridge.happyluoding.workers.dev/"
+
+# 5. 查看实时日志（需要 wrangler CLI）
+npx wrangler tail
+```
+
+#### 测试本地开发环境
+
+项目提供了两种测试脚本用于本地开发：
 
 #### TypeScript 测试脚本（推荐）
 

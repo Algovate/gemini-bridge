@@ -39,21 +39,21 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
   }
 
   try {
-    // Get API key
+    // Parse the request URL
+    const url = new URL(request.url);
+    const pathname = url.pathname;
+
+    // If pathname is just "/", provide a helpful message (no API key required)
+    if (pathname === '/') {
+      return createRootResponse(url.origin);
+    }
+
+    // Get API key (required for all other endpoints)
     const apiKey = getApiKey(request, env);
     if (!apiKey) {
       return createErrorResponse(
         'API key is required. Provide it via X-Goog-Api-Key header, ?key= query parameter, or set GEMINI_API_KEY environment variable'
       );
-    }
-
-    // Parse the request URL
-    const url = new URL(request.url);
-    const pathname = url.pathname;
-
-    // If pathname is just "/", provide a helpful message
-    if (pathname === '/') {
-      return createRootResponse(url.origin);
     }
 
     // Build target URL
