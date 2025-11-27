@@ -1,0 +1,27 @@
+{
+  "name": "gemini-bridge",
+  "version": "1.0.0",
+  "description": "A Cloudflare Worker bridge for accessing Google Gemini API from restricted regions",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "type-check": "tsc --noEmit",
+    "test:gemini": "tsx scripts/test-gemini.ts"
+  },
+  "keywords": [
+    "cloudflare",
+    "worker",
+    "gemini",
+    "proxy"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241106.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "wrangler": "^4.51.0"
+  }
+}
+

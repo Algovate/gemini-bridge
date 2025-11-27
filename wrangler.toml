@@ -1,0 +1,18 @@
+name = "gemini-bridge"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+
+# 环境变量配置
+# 在部署时通过 wrangler secret put GEMINI_API_KEY 设置
+# 或在本地开发时使用 .dev.vars 文件
+
+[env.production]
+routes = [
+  # 可以配置自定义路由，例如：
+  # { pattern = "gemini-proxy.yourdomain.com/*", zone_name = "yourdomain.com" }
+]
+
+# CPU 时间限制（毫秒）
+# 免费版限制为 10ms，付费版可以更高
+cpu_time_limit = 50
+
